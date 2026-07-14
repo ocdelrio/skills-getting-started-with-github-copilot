@@ -10,6 +10,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import RedirectResponse
 import os
 from pathlib import Path
+from threading import Lock
 
 app = FastAPI(title="Mergington High School API",
               description="API for viewing and signing up for extracurricular activities")
@@ -71,6 +72,52 @@ activities = {
     }
 }
 
+activities_lock = Lock()
+
+
+def normalize_email(email: str) -> str:
+    return email.strip().lower()
+
+
+def sign_up_participant(activity_name: str, email: str):
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    normalized_email = normalize_email(email)
+
+    with activities_lock:
+        activity = activities[activity_name]
+
+        if normalized_email in activity["participants"]:
+            raise HTTPException(
+                status_code=409,
+                detail="This student is already signed up for this activity",
+            )
+
+        activity["participants"].append(normalized_email)
+
+    return {"message": f"Signed up {normalized_email} for {activity_name}"}
+
+
+def remove_participant_from_activity(activity_name: str, email: str):
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    normalized_email = normalize_email(email)
+
+    with activities_lock:
+        activity = activities[activity_name]
+
+        if normalized_email not in activity["participants"]:
+            raise HTTPException(
+                status_code=404,
+                detail="This student is not signed up for this activity",
+            )
+
+        activity["participants"].remove(normalized_email)
+
+    return {"message": f"Removed {normalized_email} from {activity_name}"}
+
 
 @app.get("/")
 def root():
@@ -85,40 +132,10 @@ def get_activities():
 @app.post("/activities/{activity_name}/signup")
 def signup_for_activity(activity_name: str, email: str):
     """Sign up a student for an activity"""
-    # Validate activity exists
-    if activity_name not in activities:
-        raise HTTPException(status_code=404, detail="Activity not found")
-
-    # Get the specific activity
-    activity = activities[activity_name]
-    normalized_email = email.strip().lower()
-
-    # Prevent duplicate registrations for the same activity
-    if normalized_email in activity["participants"]:
-        raise HTTPException(
-            status_code=409,
-            detail="This student is already signed up for this activity",
-        )
-
-    # Add student
-    activity["participants"].append(normalized_email)
-    return {"message": f"Signed up {normalized_email} for {activity_name}"}
+    return sign_up_participant(activity_name, email)
 
 
 @app.delete("/activities/{activity_name}/participants")
 def remove_participant(activity_name: str, email: str):
     """Remove a student from an activity"""
-    if activity_name not in activities:
-        raise HTTPException(status_code=404, detail="Activity not found")
-
-    activity = activities[activity_name]
-    normalized_email = email.strip().lower()
-
-    if normalized_email not in activity["participants"]:
-        raise HTTPException(
-            status_code=404,
-            detail="This student is not signed up for this activity",
-        )
-
-    activity["participants"].remove(normalized_email)
-    return {"message": f"Removed {normalized_email} from {activity_name}"}
+    return remove_participant_from_activity(activity_name, email)
