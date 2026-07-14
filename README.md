@@ -1,4 +1,4 @@
-# Getting Started with GitHub Copilot
+# Desarrollo con sugerencias de código con tecnología de IA mediante GitHub Copilot y VS Code
 
 <img src="https://octodex.github.com/images/Professortocat_v2.png" align="right" height="200px" />
 
