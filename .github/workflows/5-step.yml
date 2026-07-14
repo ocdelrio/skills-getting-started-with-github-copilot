@@ -64,4 +64,4 @@ jobs:
     uses: skills/exercise-toolkit/.github/workflows/finish-exercise.yml@v0.8.1
     with:
       issue-url: ${{ needs.find_exercise.outputs.issue-url }}
-      exercise-title: "Getting Started with GitHub Copilot"
+      exercise-title: "Desarrollo con sugerencias de código con tecnología de IA mediante GitHub Copilot y VS Code"

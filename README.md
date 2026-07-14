@@ -1,4 +1,4 @@
-# Getting Started with GitHub Copilot
+# Desarrollo con sugerencias de código con tecnología de IA mediante GitHub Copilot y VS Code
 
 _Get started using GitHub Copilot in less than an hour._
 

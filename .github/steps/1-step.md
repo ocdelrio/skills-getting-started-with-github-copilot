@@ -1,6 +1,6 @@
 ## Step 1: Hello Copilot
 
-Welcome to your **"Getting Started with GitHub Copilot"** exercise! :robot:
+Welcome to your **"Desarrollo con sugerencias de código con tecnología de IA mediante GitHub Copilot y VS Code"** exercise! :robot:
 
 In this exercise, you will be using different GitHub Copilot features to work on a website that allows students of Mergington High School to sign up for extracurricular activities. 🎻 ⚽️ ♟️
 
